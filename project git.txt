@@ -1,0 +1,63 @@
+ Clone the Repository
+First, clone the provided repository and set up the quiz bot as per the instructions given in the repository.
+
+sh
+Copy code
+git clone https://github.com/impressai/quiz-bot.git
+cd quiz-bot
+# Follow the setup instructions provided in the repository's README file
+Step 2: Complete record_current_answer Function
+In core/reply_factory.py, locate the record_current_answer function. This function is responsible for validating and storing the user's answers.
+
+Here's a general approach:
+
+Validate the Answer: Check if the user's answer is valid (e.g., it's within the range of acceptable answers).
+Store the Answer: Record the answer in the user's session or a database.
+python
+Copy code
+def record_current_answer(user_session, answer):
+    # Assuming questions and answers are stored in user_session
+    current_question = user_session.get('current_question')
+    
+    if current_question is not None:
+        # Validate the answer (assuming answers are indexed from 0)
+        if answer in range(len(current_question['options'])):
+            user_session['answers'].append(answer)
+            return True
+        else:
+            return False
+    return False
+Step 3: Implement get_next_question Function
+This function should fetch the next question to present to the user. You'll likely need to track the current question index in the user's session.
+
+python
+Copy code
+def get_next_question(user_session):
+    # Assuming questions are stored in user_session
+    questions = user_session.get('questions')
+    current_index = user_session.get('current_index', 0)
+    
+    if current_index < len(questions):
+        user_session['current_question'] = questions[current_index]
+        user_session['current_index'] = current_index + 1
+        return questions[current_index]
+    else:
+        return None
+Step 4: Complete generate_final_response Function
+This function should calculate the user's score and provide a summary of their performance.
+
+python
+Copy code
+def generate_final_response(user_session):
+    questions = user_session.get('questions')
+    answers = user_session.get('answers')
+    
+    if not questions or not answers:
+        return "No quiz data available."
+    
+    score = sum(1 for q, a in zip(questions, answers) if q['correct_option'] == a)
+    total_questions = len(questions)
+    
+    return f"You scored {score} out of {total_questions}."
+Step 5: Test the Code Changes
+Run the quiz bot and interact with it to ensure it works as expected. The bot should ask all questions, record answers, and provide a final score.
